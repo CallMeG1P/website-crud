@@ -38,16 +38,18 @@
   // MASUKKAN URL GOOGLE APPS SCRIPT MILIKMU DI BAWAH INI
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwS6FkKDj0TTKQ4ZOTyjVtrtLgAv8kFbsGzwQVXvXX7_wnfnd-kgbxLukOF6I2TdVgPag/exec";
 
-  function ambilData() {
+function ambilData() {
     fetch(SCRIPT_URL)
       .then(res => res.json())
       .then(data => {
         let html = "";
+        
         data.forEach(row => {
-          // Solusi: Mengambil nilai kolom terlepas dari penggunaan huruf besar/kecil di Apps Script
-          let namaVal = row.nama || row.Nama || row.NAMA || "";
-          let emailVal = row.email || row.Email || row.EMAIL || "";
-          let idVal = row.id || row.Id || row.ID || "";
+          let keys = Object.keys(row);
+          
+          let idVal = row.id || row.Id || row.ID || (keys[0] ? row[keys[0]] : "");
+          let namaVal = row.nama || row.Nama || row.NAMA || (keys[1] ? row[keys[1]] : "");
+          let emailVal = row.email || row.Email || row.EMAIL || (keys[2] ? row[keys[2]] : "");
 
           html += `
             <tr>
@@ -59,7 +61,12 @@
               </td>
             </tr>`;
         });
+
         document.getElementById("tabelData").innerHTML = html || "<tr><td colspan='3'>Kosong</td></tr>";
+      })
+      .catch(err => {
+        console.error("Error:", err);
+        document.getElementById("tabelData").innerHTML = "<tr><td colspan='3'>Gagal memuat data</td></tr>";
       });
   }
 
