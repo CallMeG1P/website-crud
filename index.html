@@ -35,8 +35,8 @@
 </div>
 
 <script>
-  // MASUKKAN URL GOOGLE APPS SCRIPT DARI LANGKAH 3 DI BAWAH INI
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwS6FkKDj0TTKQ4ZOTyjVtrtLgAv8kFbsGzwQVXvXX7_wnfnd-kgbxLukOF6I2TdVgPag/exec";
+  // MASUKKAN URL GOOGLE APPS SCRIPT MILIKMU DI BAWAH INI
+  const SCRIPT_URL = "PASTE_URL_APPS_SCRIPT_DI_SINI";
 
   function ambilData() {
     fetch(SCRIPT_URL)
@@ -44,13 +44,18 @@
       .then(data => {
         let html = "";
         data.forEach(row => {
+          // Solusi: Mengambil nilai kolom terlepas dari penggunaan huruf besar/kecil di Apps Script
+          let namaVal = row.nama || row.Nama || row.NAMA || "";
+          let emailVal = row.email || row.Email || row.EMAIL || "";
+          let idVal = row.id || row.Id || row.ID || "";
+
           html += `
             <tr>
-              <td>${row.nama}</td>
-              <td>${row.email}</td>
+              <td>${namaVal}</td>
+              <td>${emailVal}</td>
               <td>
-                <button class="btn-warning" onclick="editData('${row.id}', '${row.nama}', '${row.email}')">Edit</button>
-                <button class="btn-danger" onclick="hapusData('${row.id}')">Hapus</button>
+                <button class="btn-warning" onclick="editData('${idVal}', '${namaVal}', '${emailVal}')">Edit</button>
+                <button class="btn-danger" onclick="hapusData('${idVal}')">Hapus</button>
               </td>
             </tr>`;
         });
@@ -68,7 +73,7 @@
     const action = id ? "update" : "create";
     fetch(SCRIPT_URL, {
       method: "POST",
-      body: JSON.stringify({ action, id, nama, email })
+      body: JSON.stringify({ action: action, id: id, nama: nama, email: email })
     })
     .then(res => res.json())
     .then(res => {
@@ -90,7 +95,7 @@
     if (confirm("Hapus data ini?")) {
       fetch(SCRIPT_URL, {
         method: "POST",
-        body: JSON.stringify({ action: "delete", id })
+        body: JSON.stringify({ action: "delete", id: id })
       })
       .then(res => res.json())
       .then(res => {
